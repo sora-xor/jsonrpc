@@ -4,6 +4,7 @@ use jsonrpc_core::*;
 struct Meta(usize);
 impl Metadata for Meta {}
 
+#[cfg(feature = "std")]
 pub fn main() {
 	let mut io = MetaIoHandler::default();
 
@@ -19,4 +20,9 @@ pub fn main() {
 		io.handle_request_sync(request, Meta(headers)),
 		Some(response.to_owned())
 	);
+}
+
+#[cfg(not(feature = "std"))]
+fn main() {
+	eprintln!("Use `std` feature to run the main");
 }

@@ -2,7 +2,7 @@
 use serde::de::{self, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-use std::fmt;
+use alloc::fmt;
 
 /// Protocol Version
 #[derive(Debug, PartialEq, Clone, Copy, Hash, Eq)]

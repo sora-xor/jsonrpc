@@ -1,5 +1,7 @@
 //! jsonrpc id field
 
+use alloc::string::String;
+
 /// Request Id
 #[derive(Debug, PartialEq, Clone, Hash, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -16,6 +18,7 @@ pub enum Id {
 #[cfg(test)]
 mod tests {
 	use super::*;
+	use alloc::{borrow::ToOwned, vec::Vec};
 	use serde_json;
 
 	#[test]

@@ -1,5 +1,6 @@
 use jsonrpc_core::*;
 
+#[cfg(feature = "std")]
 fn main() {
 	futures::executor::block_on(async {
 		let mut io = IoHandler::new();
@@ -13,4 +14,9 @@ fn main() {
 
 		assert_eq!(io.handle_request(request).await, Some(response.to_owned()));
 	});
+}
+
+#[cfg(not(feature = "std"))]
+fn main() {
+	eprintln!("Use `std` feature to run the main");
 }

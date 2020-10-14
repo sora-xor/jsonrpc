@@ -2,8 +2,9 @@
 
 use crate::calls::Metadata;
 use crate::types::{Call, Output, Request, Response};
+use alloc::boxed::Box;
+use core::pin::Pin;
 use futures::{future::Either, Future};
-use std::pin::Pin;
 
 /// RPC middleware
 pub trait Middleware<M: Metadata>: Send + Sync + 'static {

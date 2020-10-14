@@ -1,6 +1,7 @@
 //! jsonrpc request
 
 use super::{Id, Params, Version};
+use alloc::{string::String, vec::Vec};
 
 /// Represents jsonrpc request which is a method call.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -84,6 +85,7 @@ pub enum Request {
 #[cfg(test)]
 mod tests {
 	use super::*;
+	use alloc::borrow::ToOwned;
 	use serde_json::Value;
 
 	#[test]

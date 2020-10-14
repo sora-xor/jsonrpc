@@ -1,10 +1,10 @@
-use std::collections::{
-	hash_map::{IntoIter, Iter},
-	HashMap,
+use alloc::collections::{
+	btree_map::{IntoIter, Iter},
+	BTreeMap,
 };
-use std::ops::{Deref, DerefMut};
-use std::pin::Pin;
-use std::sync::Arc;
+use alloc::sync::Arc;
+use core::ops::{Deref, DerefMut};
+use core::pin::Pin;
 
 use futures::{self, future, Future, FutureExt};
 use serde_json;
@@ -15,6 +15,7 @@ use crate::calls::{
 use crate::middleware::{self, Middleware};
 use crate::types::{Call, Output, Request, Response};
 use crate::types::{Error, ErrorCode, Version};
+use alloc::{boxed::Box, string::String, vec::Vec};
 
 /// A type representing middleware or RPC response before serialization.
 pub type FutureResponse = Pin<Box<dyn Future<Output = Option<Response>> + Send>>;
@@ -80,7 +81,7 @@ impl Compatibility {
 pub struct MetaIoHandler<T: Metadata, S: Middleware<T> = middleware::Noop> {
 	middleware: S,
 	compatibility: Compatibility,
-	methods: HashMap<String, RemoteProcedure<T>>,
+	methods: BTreeMap<String, RemoteProcedure<T>>,
 }
 
 impl<T: Metadata> Default for MetaIoHandler<T> {
@@ -197,6 +198,7 @@ impl<T: Metadata, S: Middleware<T>> MetaIoHandler<T, S> {
 	/// Handle given request synchronously - will block until response is available.
 	/// If you have any asynchronous methods in your RPC it is much wiser to use
 	/// `handle_request` instead and deal with asynchronous requests in a non-blocking fashion.
+	#[cfg(feature = "std")]
 	pub fn handle_request_sync(&self, request: &str, meta: T) -> Option<String> {
 		futures::executor::block_on(self.handle_request(request, meta))
 	}
@@ -376,7 +378,7 @@ impl<M: Metadata> IoHandlerExtension<M> for Vec<(String, RemoteProcedure<M>)> {
 	}
 }
 
-impl<M: Metadata> IoHandlerExtension<M> for HashMap<String, RemoteProcedure<M>> {
+impl<M: Metadata> IoHandlerExtension<M> for BTreeMap<String, RemoteProcedure<M>> {
 	fn augment<S: Middleware<M>>(self, handler: &mut MetaIoHandler<M, S>) {
 		handler.methods.extend(self)
 	}
@@ -441,6 +443,7 @@ impl<M: Metadata + Default> IoHandler<M> {
 	/// Handle given request synchronously - will block until response is available.
 	/// If you have any asynchronous methods in your RPC it is much wiser to use
 	/// `handle_request` instead and deal with asynchronous requests in a non-blocking fashion.
+	#[cfg(feature = "std")]
 	pub fn handle_request_sync(&self, request: &str) -> Option<String> {
 		self.0.handle_request_sync(request, M::default())
 	}
@@ -481,10 +484,12 @@ fn write_response(response: Response) -> String {
 	serde_json::to_string(&response).unwrap()
 }
 
+#[cfg(feature = "std")]
 #[cfg(test)]
 mod tests {
 	use super::{Compatibility, IoHandler};
 	use crate::types::Value;
+	use core::sync::atomic;
 	use futures::future;
 
 	#[test]
@@ -525,7 +530,6 @@ mod tests {
 
 	#[test]
 	fn test_notification() {
-		use std::sync::atomic;
 		use std::sync::Arc;
 
 		let mut io = IoHandler::new();
@@ -584,7 +588,6 @@ mod tests {
 
 	#[test]
 	fn test_batch_notification() {
-		use std::sync::atomic;
 		use std::sync::Arc;
 
 		let mut io = IoHandler::new();
@@ -618,7 +621,7 @@ mod tests {
 	fn test_extending_by_multiple_delegates() {
 		use super::IoHandlerExtension;
 		use crate::delegates::IoDelegate;
-		use std::sync::Arc;
+		use alloc::sync::Arc;
 
 		struct Test;
 		impl Test {

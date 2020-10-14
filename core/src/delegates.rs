@@ -1,11 +1,12 @@
 //! Delegate rpc calls
 
-use std::collections::HashMap;
-use std::sync::Arc;
+use alloc::collections::btree_map::BTreeMap;
+use alloc::sync::Arc;
 
 use crate::calls::{Metadata, RemoteProcedure, RpcMethod, RpcNotification};
 use crate::types::{Error, Params, Value};
 use crate::BoxFuture;
+use alloc::{boxed::Box, string::String};
 use futures::Future;
 
 struct DelegateAsyncMethod<T, F> {
@@ -89,7 +90,7 @@ where
 	M: Metadata,
 {
 	delegate: Arc<T>,
-	methods: HashMap<String, RemoteProcedure<M>>,
+	methods: BTreeMap<String, RemoteProcedure<M>>,
 }
 
 impl<T, M> IoDelegate<T, M>
@@ -101,7 +102,7 @@ where
 	pub fn new(delegate: Arc<T>) -> Self {
 		IoDelegate {
 			delegate,
-			methods: HashMap::new(),
+			methods: BTreeMap::new(),
 		}
 	}
 
@@ -190,7 +191,7 @@ where
 	M: Metadata,
 {
 	type Item = (String, RemoteProcedure<M>);
-	type IntoIter = std::collections::hash_map::IntoIter<String, RemoteProcedure<M>>;
+	type IntoIter = alloc::collections::btree_map::IntoIter<String, RemoteProcedure<M>>;
 
 	fn into_iter(self) -> Self::IntoIter {
 		self.methods.into_iter()

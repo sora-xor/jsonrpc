@@ -4,7 +4,7 @@
 //!
 //! ```rust
 //! use jsonrpc_core::*;
-//!
+//! #[cfg(feature = "std")]
 //! fn main() {
 //! 	let mut io = IoHandler::new();
 //! 	io.add_sync_method("say_hello", |_| {
@@ -16,11 +16,20 @@
 //!
 //! 	assert_eq!(io.handle_request_sync(request), Some(response.to_string()));
 //! }
+//!
+//! #[cfg(not(feature = "std"))]
+//! fn main() {
+//! 	eprintln!("Use `std` feature to run the main");
+//! }
 //! ```
 
-#![deny(missing_docs)]
+#![cfg_attr(not(feature = "std"), no_std)]
+#![warn(missing_docs)]
 
-use std::pin::Pin;
+#[macro_use]
+extern crate alloc;
+
+use core::pin::Pin;
 
 #[macro_use]
 extern crate log;
@@ -40,9 +49,10 @@ mod io;
 pub mod delegates;
 pub mod middleware;
 pub mod types;
+use alloc::boxed::Box;
 
 /// A Result type.
-pub type Result<T> = std::result::Result<T, Error>;
+pub type Result<T> = core::result::Result<T, Error>;
 
 /// A `Future` trait object.
 pub type BoxFuture<T> = Pin<Box<dyn futures::Future<Output = T> + Send>>;
@@ -64,7 +74,7 @@ use serde_json::Error as SerdeError;
 /// workaround for https://github.com/serde-rs/json/issues/505
 /// Arbitrary precision confuses serde when deserializing into untagged enums,
 /// this is a workaround
-pub fn serde_from_str<'a, T>(input: &'a str) -> std::result::Result<T, SerdeError>
+pub fn serde_from_str<'a, T>(input: &'a str) -> core::result::Result<T, SerdeError>
 where
 	T: serde::de::Deserialize<'a>,
 {

@@ -5,6 +5,7 @@ use serde_json;
 use serde_json::value::from_value;
 
 use super::{Error, Value};
+use alloc::{string::String, vec::Vec};
 
 /// Request parameters
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
@@ -53,6 +54,7 @@ impl From<Params> for Value {
 mod tests {
 	use super::Params;
 	use crate::types::{Error, ErrorCode, Value};
+	use alloc::string::{String, ToString};
 	use serde_json;
 
 	#[test]

@@ -30,6 +30,7 @@ impl Middleware<Meta> for MyMiddleware {
 	}
 }
 
+#[cfg(feature = "std")]
 pub fn main() {
 	let mut io = MetaIoHandler::with_middleware(MyMiddleware::default());
 
@@ -45,4 +46,9 @@ pub fn main() {
 		io.handle_request_sync(request, Meta(headers)),
 		Some(response.to_owned())
 	);
+}
+
+#[cfg(not(feature = "std"))]
+fn main() {
+	eprintln!("Use `std` feature to run the main");
 }

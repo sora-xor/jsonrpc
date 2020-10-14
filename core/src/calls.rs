@@ -1,8 +1,10 @@
 use crate::types::{Error, Params, Value};
 use crate::BoxFuture;
+use alloc::boxed::Box;
+use alloc::fmt;
+use alloc::string::String;
+use alloc::sync::Arc;
 use futures::Future;
-use std::fmt;
-use std::sync::Arc;
 
 /// Metadata trait
 pub trait Metadata: Clone + Send + 'static {}

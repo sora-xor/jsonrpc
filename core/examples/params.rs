@@ -6,6 +6,7 @@ struct HelloParams {
 	name: String,
 }
 
+#[cfg(feature = "std")]
 fn main() {
 	let mut io = IoHandler::new();
 
@@ -18,4 +19,9 @@ fn main() {
 	let response = r#"{"jsonrpc":"2.0","result":"hello, world","id":1}"#;
 
 	assert_eq!(io.handle_request_sync(request), Some(response.to_owned()));
+}
+
+#[cfg(not(feature = "std"))]
+fn main() {
+	eprintln!("Use `std` feature to run the main");
 }

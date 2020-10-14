@@ -1,8 +1,12 @@
 //! jsonrpc errors
 use super::Value;
+use alloc::fmt;
+use alloc::{
+	borrow::ToOwned,
+	string::{String, ToString},
+};
 use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
-use std::fmt;
 
 /// JSONRPC error code
 #[derive(Debug, PartialEq, Clone)]
@@ -159,10 +163,11 @@ impl Error {
 	}
 }
 
-impl std::fmt::Display for Error {
-	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Display for Error {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		write!(f, "{}: {}", self.code.description(), self.message)
 	}
 }
 
+#[cfg(feature = "std")]
 impl std::error::Error for Error {}
