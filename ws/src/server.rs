@@ -74,7 +74,11 @@ impl Server {
 			config.max_out_buffer_capacity = max_out_buffer_capacity;
 			// don't grow non-final fragments (to prevent DOS)
 			config.fragments_grow = false;
-			config.fragments_capacity = cmp::max(1, max_payload_bytes / config.fragment_size);
+			// Browsers send fragments of 4096 bytes.
+			config.fragments_capacity = (max_payload_bytes as f32 / 4096.0).ceil() as usize;
+			if config.fragments_capacity == 0 {
+				config.fragments_capacity = 1
+			}
 			// accept only handshakes beginning with GET
 			config.method_strict = true;
 			// require masking
